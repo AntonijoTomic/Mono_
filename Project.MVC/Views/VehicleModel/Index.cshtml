@@ -1,0 +1,131 @@
+﻿@model Project.MVC.ViewModels.VehicleModelView
+
+<a href="@Url.Action("Create", "VehicleModel")" class="btn btn-primary">Create New</a>
+<br />
+<label for="MakeId">Choose make:</label>
+<select id="makeSelect" class="form-select" onchange="location = this.value;">
+    <option value=></option>
+    <option value="@Url.Action("Index")">Reset filters</option>
+    @foreach (var make in Model.Makes)
+    {
+        <option value="@Url.Action("Index", new { filter = make.Id })">@make.Name</option>
+    }
+</select>
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>
+                <a asp-action="Index" asp-route-filter="@(Model.filter)" asp-route-sortby="Name" asp-route-sortorder="@(Model.SortBy == "Name" && Model.SortOrder == "asc" ? "desc" : "asc")">Name</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-filter="@(Model.filter)" asp-route-sortby="Abrv" asp-route-sortorder="@(Model.SortBy == "Abrv" && Model.SortOrder == "asc" ? "desc" : "asc")">Abrv</a>
+            </th>
+             <th>
+                <a asp-action="Index" asp-route-filter="@(Model.filter)" asp-route-sortby="Makes" asp-route-sortorder="@(Model.SortBy == "Makes" && Model.SortOrder == "asc" ? "desc" : "asc")">Makes</a>
+            </th>
+            <th>
+                <a>Delete</a>
+            </th>
+            <th>
+                <a>Update</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vehicleModel in Model.models)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => vehicleModel.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => vehicleModel.Abrv)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => vehicleModel.makes.Name)
+                </td>
+                <td>
+                    <form asp-controller="VehicleModel" asp-action="DeleteVehicle" method="post">
+                        <input type="hidden" name="id" value="@vehicleModel.Id" />
+                        <button class="btn btn-primary" type="submit" onclick="return confirm('Are you sure you want to delete?')">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <button class="btn btn-primary" onclick="openEditModal('@vehicleModel.Id', '@vehicleModel.Name', '@vehicleModel.Abrv','@vehicleModel.MakeId')">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (Model.PaginationInfo.TotalPages > 1)
+{
+    <ul class="pagination">
+        @if (Model.PaginationInfo.CurrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.PaginationInfo.CurrentPage - 1)" asp-route-filter="@(Model.filter)" asp-route-sortby="@(Model.SortBy)" asp-route-sortorder="@(Model.SortOrder)">Previous</a>
+            </li>
+        }
+
+        @for (int i = 1; i <= Model.PaginationInfo.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PaginationInfo.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-filter="@(Model.filter)" asp-route-sortby="@(Model.SortBy)" asp-route-sortorder="@(Model.SortOrder)">@i</a>
+            </li>
+        }
+
+        @if (Model.PaginationInfo.CurrentPage < Model.PaginationInfo.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.PaginationInfo.CurrentPage + 1)" asp-route-filter="@(Model.filter)" asp-route-sortby="@(Model.SortBy)" asp-route-sortorder="@(Model.SortOrder)">NEXT</a>
+            </li>
+        }
+    </ul>
+}
+ <div class="modal" id="editVehicleModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Vehicle</h5>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" asp-controller="VehicleModel" asp-action="UpdateVehicleModel" method="post">
+                    <input type="hidden" name="Id" id="editId" />
+               
+                    <div class="form-group">
+                        <label for="editName">Name</label>
+                        <input type="text" class="form-control" name="Name" id="editName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editAbrv">Abbreviation</label>
+                        <input type="text" class="form-control" name="Abrv" id="editAbrv" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editMake">Choose make:</label>
+                        <select class="form-select" name="MakeId" id="editMake">
+                            @foreach (var make in Model.Makes)
+                            {
+                                <option name="MakeId" value="@make.Id">@make.Name</option>
+                            }
+                        </select>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function openEditModal(id, name, abrv, makeId) {
+        document.getElementById('editId').value = id;
+       // document.getElementById('editMakeId').value = makeId;
+        document.getElementById('editName').value = name;
+        document.getElementById('editAbrv').value = abrv;
+        $('#editMake').val(makeId);
+        $('#editVehicleModal').modal('show');
+    }
+</script>

@@ -1,0 +1,17 @@
+﻿@model Project.Service.Models.VehicleMake
+
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Abrv"></label>
+        <input asp-for="Abrv" class="form-control" />
+        <span asp-validation-for="Abrv" class="text-danger"></span>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
